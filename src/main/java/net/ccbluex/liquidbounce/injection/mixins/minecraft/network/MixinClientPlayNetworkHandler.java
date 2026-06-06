@@ -20,6 +20,7 @@
 package net.ccbluex.liquidbounce.injection.mixins.minecraft.network;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.ccbluex.liquidbounce.LiquidBounce;
 import net.ccbluex.liquidbounce.common.ChunkUpdateFlag;
 import net.ccbluex.liquidbounce.config.Choice;
 import net.ccbluex.liquidbounce.event.EventManager;
@@ -76,9 +77,14 @@ public abstract class MixinClientPlayNetworkHandler extends ClientCommonNetworkH
 
     @Inject(method = "onChunkDeltaUpdate", at = @At("RETURN"))
     private void onChunkDeltaUpdateEnd(ChunkDeltaUpdateS2CPacket packet, CallbackInfo ci) {
-        var chunkPosition = packet.sectionPos.toChunkPos();
-        EventManager.INSTANCE.callEvent(new ChunkDeltaUpdateEvent(chunkPosition.x, chunkPosition.z));
-        ChunkUpdateFlag.chunkUpdate = false;
+        try {
+            var chunkPosition = packet.sectionPos.toChunkPos();
+            EventManager.INSTANCE.callEvent(new ChunkDeltaUpdateEvent(chunkPosition.x, chunkPosition.z));
+        } catch (Throwable throwable) {
+            LiquidBounce.INSTANCE.getLogger().error("Failed to handle chunk delta update event", throwable);
+        } finally {
+            ChunkUpdateFlag.chunkUpdate = false;
+        }
     }
 
     @Redirect(method = "onExplosion", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/Vec3d;add(DDD)Lnet/minecraft/util/math/Vec3d;"))

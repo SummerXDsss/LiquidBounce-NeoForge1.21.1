@@ -173,6 +173,9 @@
     //bottom: 15px;
     //left: 50%;
     //transform: translateX(-50%);
+    position: relative;
+    width: 405px;
+    pointer-events: none;
   }
 
   .pair {
@@ -184,6 +187,7 @@
   .status {
     display: flex;
     flex-direction: column;
+    width: 405px;
     margin-bottom: 5px;
     row-gap: 5px;
     column-gap: 20px;
@@ -192,11 +196,14 @@
   .hotbar-elements {
     background-color: rgba($hotbar-base-color, 0.68);
     position: relative;
+    width: 405px;
+    height: 45px;
     border-radius: 5px;
     overflow: hidden;
 
     .slider {
       border: solid 2px $accent-color;
+      box-sizing: border-box;
       height: 45px;
       width: 45px;
       position: absolute;
@@ -206,9 +213,11 @@
 
     .slots {
       display: flex;
+      width: 405px;
     }
 
     .slot {
+      flex: 0 0 45px;
       height: 45px;
       width: 45px;
     }
@@ -222,6 +231,7 @@
     position: absolute;
     bottom: 0;
     left: -65px;
+    pointer-events: none;
   }
 
   .item-name {

@@ -188,11 +188,13 @@ class StatusEffectInstanceSerializer : JsonSerializer<StatusEffectInstance> {
 class SessionSerializer : JsonSerializer<Session> {
     override fun serialize(src: Session?, typeOfSrc: Type?, context: JsonSerializationContext?)
         = src?.let {
+            val uuid = runCatching { it.uuidOrNull }.getOrNull()
+
             JsonObject().apply {
                 addProperty("username", it.username)
-                addProperty("uuid", it.uuidOrNull.toString())
+                addProperty("uuid", uuid?.toString().orEmpty())
                 addProperty("accountType", it.accountType.getName())
-                addProperty("avatar", formatAvatarUrl(it.uuidOrNull, it.username))
+                addProperty("avatar", formatAvatarUrl(uuid, it.username))
                 addProperty("premium", it.isPremium())
             }
         }
@@ -225,4 +227,3 @@ internal val protocolGson = GsonBuilder()
     .registerTypeAdapter(Identifier::class.java, IdentifierSerializer())
     .registerTypeAdapter(StatusEffectInstance::class.java, StatusEffectInstanceSerializer())
     .create()
-

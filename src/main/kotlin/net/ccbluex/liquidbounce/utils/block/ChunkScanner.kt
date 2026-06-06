@@ -150,7 +150,12 @@ object ChunkScanner : Listenable {
         }
 
         fun enqueueChunkUpdate(request: UpdateRequest) {
-            this.chunkUpdateQueue.put(request)
+            if (this.chunkUpdateQueue.offer(request)) {
+                return
+            }
+
+            this.chunkUpdateQueue.poll()
+            this.chunkUpdateQueue.offer(request)
         }
 
         /**

@@ -21,6 +21,7 @@ package net.ccbluex.liquidbounce.features.module.modules.render
 import net.ccbluex.liquidbounce.config.Configurable
 import net.ccbluex.liquidbounce.config.Value
 import net.ccbluex.liquidbounce.event.EventManager
+import net.ccbluex.liquidbounce.event.events.OverlayRenderEvent
 import net.ccbluex.liquidbounce.event.events.ScreenEvent
 import net.ccbluex.liquidbounce.event.events.SpaceSeperatedNamesChangeEvent
 import net.ccbluex.liquidbounce.event.handler
@@ -73,6 +74,16 @@ object ModuleHud : Module("HUD", Category.RENDER, state = true, hide = true) {
             browserTab?.closeTab()
             browserTab = null
         } else if (browserTab == null) {
+            browserTab = ThemeManager.openImmediate(VirtualScreenType.HUD, true)
+        }
+    }
+
+    val overlayHandler = handler<OverlayRenderEvent>(ignoreCondition = true) {
+        if (!enabled || !inGame || isHidingNow) {
+            return@handler
+        }
+
+        if (browserTab == null) {
             browserTab = ThemeManager.openImmediate(VirtualScreenType.HUD, true)
         }
     }
