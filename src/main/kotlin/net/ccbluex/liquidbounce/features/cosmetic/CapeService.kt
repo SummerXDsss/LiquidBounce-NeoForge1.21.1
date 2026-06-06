@@ -115,8 +115,6 @@ object CapeService : Listenable, Configurable("Cape") {
                         // Update to new carriers
                         capeCarriers = jsonCapeCarriers
 
-                        task = null
-
                         // Reset timer and start once again
                         lastUpdate.reset()
 
@@ -126,6 +124,8 @@ object CapeService : Listenable, Configurable("Cape") {
                         }
                     }.onFailure {
                         logger.error("Failed to refresh cape carriers due to error.", it)
+                    }.also {
+                        task = null
                     }
                 }
             } else {
@@ -140,15 +140,23 @@ object CapeService : Listenable, Configurable("Cape") {
      */
     fun getCapeDownload(uuid: UUID): Pair<String, String>? {
         val clientCapeUser = clientCapeUser
+        val sessionUuid = runCatching { mc.session.uuidOrNull }.getOrNull()
 
-        if (uuid == mc.session.uuidOrNull && clientCapeUser != null) {
+        if (uuid == sessionUuid && clientCapeUser != null) {
             // If the UUID is the same as the current user, we can use the clientCapeUser
             val capeName = clientCapeUser.capeName
+            if (capeName.isBlank()) {
+                return null
+            }
+
             return capeName to String.format(CAPE_NAME_DL_BASE_URL, capeName)
         }
 
         // Lookup cape carrier by UUID, if UUID is matching
         val capeCarrier = capeCarriers.find { it.uuid == uuid } ?: return null
+        if (capeCarrier.capeName.isBlank()) {
+            return null
+        }
 
         return capeCarrier.capeName to String.format(CAPE_NAME_DL_BASE_URL, capeCarrier.capeName)
     }
