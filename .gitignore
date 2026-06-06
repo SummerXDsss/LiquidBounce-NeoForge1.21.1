@@ -1,0 +1,16 @@
+.idea/*
+*.iml
+*.ipr
+*.iws
+bin/
+.settings/
+.gradle/
+build/
+run/
+mcef/
+logs/
+release/
+.playwright-mcp/
+.spec-workflow/
+src-theme/node_modules/
+src-theme/dist/

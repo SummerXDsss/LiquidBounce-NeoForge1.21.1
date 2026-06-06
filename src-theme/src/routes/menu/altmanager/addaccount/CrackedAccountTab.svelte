@@ -1,0 +1,28 @@
+<script lang="ts">
+    import Tab from "../../common/modal/Tab.svelte";
+    import IconTextInput from "../../common/setting/IconTextInput.svelte";
+    import ButtonSetting from "../../common/setting/ButtonSetting.svelte";
+    import {addCrackedAccount} from "../../../../integration/rest";
+    import {faker} from "@faker-js/faker";
+    import IconButton from "../../common/buttons/IconButton.svelte";
+    import SwitchSetting from "../../common/setting/SwitchSetting.svelte";
+
+    let username = "";
+    let online = false;
+
+    async function addAccount() {
+        await addCrackedAccount(username, online);
+    }
+
+    function generateRandomUsername() {
+        username = faker.internet.userName().substring(0, 16).replace(/[^a-zA-Z0-9_]+/gi, "");
+    }
+</script>
+
+<Tab>
+    <IconTextInput icon="user" title="用户名" bind:value={username} maxLength={16}>
+        <IconButton icon="random" title="随机" on:click={generateRandomUsername}/>
+    </IconTextInput>
+    <SwitchSetting title="使用在线 UUID" bind:value={online}/>
+    <ButtonSetting title="添加账号" on:click={addAccount} listenForEnter={true} inset={true}/>
+</Tab>

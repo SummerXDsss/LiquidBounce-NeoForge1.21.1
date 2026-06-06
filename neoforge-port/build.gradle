@@ -1,0 +1,263 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm' version "${kotlin_version}"
+    id 'dev.architectury.loom' version "${architectury_loom_version}"
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.github.node-gradle.node' version '7.0.2'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = "${mod_id}-neoforge"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+loom {
+    silentMojangMappingsLicense()
+    accessWidenerPath = file('../src/main/resources/liquidbounce.accesswidener')
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        name = 'Architectury'
+        url = 'https://maven.architectury.dev/'
+    }
+    maven {
+        name = 'Fabric'
+        url = 'https://maven.fabricmc.net/'
+    }
+    maven {
+        name = 'NeoForged'
+        url = 'https://maven.neoforged.net/releases'
+    }
+    maven {
+        name = 'Jitpack'
+        url = 'https://jitpack.io'
+    }
+    maven {
+        name = 'TerraformersMC'
+        url = 'https://maven.terraformersmc.com/'
+    }
+    maven {
+        name = 'ViaVersion'
+        url = 'https://repo.viaversion.com/'
+    }
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+    }
+    maven {
+        name = 'OpenCollab Snapshots'
+        url = 'https://repo.opencollab.dev/maven-snapshots/'
+    }
+    maven {
+        name = 'Lenni0451'
+        url = 'https://maven.lenni0451.net/everything'
+    }
+}
+
+configurations {
+    shade
+    mappingsResource
+    runtimeMods
+    implementation.extendsFrom(shade)
+    minecraftClientRuntimeLibraries.extendsFrom(shade)
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.layered {
+        mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
+        mappings "dev.architectury:yarn-mappings-patch-neoforge:${yarn_mappings_patch_neoforge}"
+    }
+    mappingsResource "net.fabricmc:yarn:${yarn_mappings}:v2"
+    neoForge "net.neoforged:neoforge:${neo_version}"
+
+    shade "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
+    shade "org.jetbrains.kotlin:kotlin-reflect:${kotlin_version}"
+    shade 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1'
+
+    shade 'org.apache.commons:commons-lang3:3.14.0'
+    shade 'commons-codec:commons-codec:1.16.0'
+    shade 'org.apache.httpcomponents:httpclient:4.5.14'
+    shade 'com.google.code.findbugs:jsr305:3.0.2'
+    shade 'net.fabricmc:tiny-mappings-parser:0.3.0+build.17'
+
+    shade("com.github.CCBlueX:mc-authlib:${mc_authlib_version}") {
+        exclude group: 'com.google.code.gson', module: 'gson'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-core'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-api'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+        exclude group: 'com.mojang', module: 'authlib'
+    }
+    modImplementation "maven.modrinth:mcef-keksuccino:${mcef_version}"
+    runtimeMods "maven.modrinth:mcef-keksuccino:${mcef_version}"
+    shade("com.github.CCBlueX:DiscordIPC:-SNAPSHOT") {
+        exclude group: 'net.lenni0451', module: 'Reflect'
+    }
+    shade 'net.lenni0451:Reflect:1.3.2'
+
+    shade 'org.graalvm.sdk:graal-sdk:23.0.5'
+    shade 'org.graalvm.truffle:truffle-api:23.0.5'
+    shade 'org.graalvm.js:js:23.0.5'
+
+    shade('io.netty:netty-codec-http:4.1.97.Final') {
+        transitive = false
+    }
+    shade('io.netty:netty-handler-proxy:4.1.97.Final') {
+        transitive = false
+    }
+    shade('io.netty:netty-codec-socks:4.1.97.Final') {
+        transitive = false
+    }
+
+    shade 'com.vdurmont:semver4j:3.1.0'
+    shade 'org.apache.tika:tika-core:2.9.2'
+    shade 'org.apache.commons:commons-exec:1.3'
+
+    compileOnly "de.florianmichael:ViaFabricPlus:${viafabricplus_version}"
+}
+
+sourceSets {
+    main {
+        java.srcDir file('../src/main/java')
+        kotlin.srcDir file('../src/main/kotlin')
+        resources.srcDir file('../src/main/resources')
+        resources.srcDir file('../src-theme/resources')
+        resources.srcDir layout.buildDirectory.dir('generated/resources/mappings')
+        resources.srcDir layout.buildDirectory.dir('generated/resources/git')
+        resources.exclude 'fabric.mod.json'
+    }
+}
+
+def replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version            : neo_version,
+        neo_version_range      : neo_version_range,
+        loader_version_range   : loader_version_range,
+        mcef_version_range     : mcef_version_range,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_license            : mod_license,
+        mod_version            : mod_version,
+        mod_authors            : mod_authors,
+        mod_description        : mod_description
+]
+
+tasks.named('processResources', ProcessResources).configure {
+    dependsOn 'bundleTheme', 'includeMappings', 'generateGitProperties'
+    inputs.properties replaceProperties
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand replaceProperties
+    }
+}
+
+node {
+    download = false
+}
+
+tasks.register('npmInstallTheme', com.github.gradle.node.npm.task.NpmTask) {
+    workingDir = file('../src-theme')
+    args = ['install', '--no-package-lock']
+
+    inputs.files(
+            file('../src-theme/package.json')
+    )
+    outputs.dir(file('../src-theme/node_modules'))
+}
+
+tasks.register('buildTheme', com.github.gradle.node.npm.task.NpmTask) {
+    dependsOn 'npmInstallTheme'
+    workingDir = file('../src-theme')
+    args = ['run', 'build']
+
+    inputs.files(
+            file('../src-theme/package.json'),
+            file('../src-theme/bundle.cjs'),
+            file('../src-theme/svelte.config.js'),
+            file('../src-theme/tsconfig.json'),
+            file('../src-theme/tsconfig.node.json'),
+            file('../src-theme/vite.config.ts'),
+            file('../src-theme/index.html')
+    )
+    inputs.dir(file('../src-theme/src'))
+    inputs.dir(file('../src-theme/public'))
+    outputs.dir(file('../src-theme/dist'))
+}
+
+tasks.register('bundleTheme', com.github.gradle.node.task.NodeTask) {
+    dependsOn 'buildTheme'
+    workingDir = file('../src-theme')
+    script = file('../src-theme/bundle.cjs')
+
+    inputs.files(
+            file('../src-theme/package.json'),
+            file('../src-theme/bundle.cjs')
+    )
+    inputs.dir(file('../src-theme/dist'))
+    outputs.file(file('../src-theme/resources/assets/liquidbounce/default_theme.zip'))
+}
+
+tasks.register('includeMappings', Copy) {
+    from({ zipTree(configurations.mappingsResource.singleFile) }) {
+        include 'mappings/mappings.tiny'
+    }
+    into layout.buildDirectory.dir('generated/resources/mappings')
+}
+
+tasks.register('generateGitProperties', WriteProperties) {
+    destinationFile = layout.buildDirectory.file('generated/resources/git/git.properties')
+    property 'git.build.version', mod_version
+    property 'git.branch', 'nextgen'
+    property 'git.commit.id.abbrev', 'neoforge'
+    property 'git.commit.time', '1970-01-01T00:00:00+0000'
+}
+
+tasks.register('copyRuntimeMods', Copy) {
+    from configurations.runtimeMods
+    into layout.buildDirectory.dir('runtime-mods')
+}
+
+tasks.named('build').configure {
+    dependsOn 'copyRuntimeMods'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 21
+}
+
+shadowJar {
+    archiveClassifier.set('shadow')
+    configurations = [project.configurations.shade]
+
+    relocate 'org.apache.http', 'net.ccbluex.liquidbounce.shadow.apache.http'
+    relocate 'org.apache.commons', 'net.ccbluex.liquidbounce.shadow.apache.commons'
+    relocate 'org.apache.tika', 'net.ccbluex.liquidbounce.shadow.apache.tika'
+
+    relocate 'io.netty.handler.codec.http', 'net.ccbluex.liquidbounce.shadow.netty.handler.codec.http'
+    relocate 'io.netty.handler.codec.socks', 'net.ccbluex.liquidbounce.shadow.netty.handler.codec.socks'
+    relocate 'io.netty.handler.proxy', 'net.ccbluex.liquidbounce.shadow.netty.handler.proxy'
+
+    exclude 'META-INF/*.RSA'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/versions/20/**'
+    exclude 'com/google/gson/**'
+    exclude 'io/netty/handler/codec/rtsp/**'
+    exclude 'io/netty/handler/codec/spdy/**'
+
+    mergeServiceFiles()
+}
+
+remapJar {
+    inputFile = shadowJar.archiveFile
+}
