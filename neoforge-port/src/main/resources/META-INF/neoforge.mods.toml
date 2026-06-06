@@ -32,3 +32,10 @@ type = "required"
 versionRange = "${mcef_version_range}"
 ordering = "AFTER"
 side = "CLIENT"
+
+[[dependencies.${mod_id}]]
+modId = "kotlinforforge"
+type = "required"
+versionRange = "[5.0,)"
+ordering = "NONE"
+side = "CLIENT"
