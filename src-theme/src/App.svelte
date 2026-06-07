@@ -6,7 +6,6 @@
     import {cleanupListeners, listenAlways} from "./integration/ws";
     import {onMount} from "svelte";
     import {insertPersistentData} from "./integration/persistent_storage";
-    import Inventory from "./routes/inventory/Inventory.svelte";
     import Title from "./routes/menu/title/Title.svelte";
     import SplashScreen from "./routes/menu/splash/SplashScreen.svelte";
     import Multiplayer from "./routes/menu/multiplayer/Multiplayer.svelte";
@@ -20,7 +19,6 @@
     const routes = {
         "/clickgui": ClickGui,
         "/hud": Hud,
-        "/inventory": Inventory,
         "/title": Title,
         "/splash": SplashScreen,
         "/multiplayer": Multiplayer,

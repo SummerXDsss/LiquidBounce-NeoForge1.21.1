@@ -98,9 +98,6 @@ dependencies {
     }
     modImplementation "maven.modrinth:mcef-keksuccino:${mcef_version}"
     runtimeMods "maven.modrinth:mcef-keksuccino:${mcef_version}"
-    shade("com.github.CCBlueX:DiscordIPC:-SNAPSHOT") {
-        exclude group: 'net.lenni0451', module: 'Reflect'
-    }
     shade 'net.lenni0451:Reflect:1.3.2'
 
     shade 'org.graalvm.sdk:graal-sdk:23.0.5'
@@ -242,7 +239,6 @@ shadowJar {
     relocate 'org.apache.http', 'net.ccbluex.liquidbounce.shadow.apache.http'
     relocate 'org.apache.commons', 'net.ccbluex.liquidbounce.shadow.apache.commons'
     relocate 'org.apache.tika', 'net.ccbluex.liquidbounce.shadow.apache.tika'
-    relocate 'com.jagrosh.discordipc', 'net.ccbluex.liquidbounce.shadow.discordipc'
     relocate 'com.thealtening.api', 'net.ccbluex.liquidbounce.shadow.thealtening.api'
     relocate 'com.vdurmont.semver4j', 'net.ccbluex.liquidbounce.shadow.semver4j'
     relocate 'net.fabricmc.mapping', 'net.ccbluex.liquidbounce.shadow.fabricmc.mapping'

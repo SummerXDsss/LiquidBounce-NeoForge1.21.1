@@ -13,9 +13,7 @@
   ],
   "overlays": [
     "hud",
-    "inventory",
     "splash",
-    "container",
     "disconnected",
     "browser"
   ],
@@ -135,36 +133,6 @@
             {
               "name": "VerticalOffset",
               "value": 5
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Hotbar",
-      "value": [
-        {
-          "name": "Enabled",
-          "value": true
-        },
-        {
-          "name": "Alignment",
-          "value": [
-            {
-              "name": "Horizontal",
-              "value": "CenterTranslated"
-            },
-            {
-              "name": "HorizontalOffset",
-              "value": 0
-            },
-            {
-              "name": "Vertical",
-              "value": "Bottom"
-            },
-            {
-              "name": "VerticalOffset",
-              "value": 15
             }
           ]
         }

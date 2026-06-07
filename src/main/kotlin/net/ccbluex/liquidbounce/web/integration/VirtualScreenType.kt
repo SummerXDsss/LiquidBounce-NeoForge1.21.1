@@ -28,9 +28,6 @@ import net.minecraft.client.gui.screen.DisconnectedScreen
 import net.minecraft.client.gui.screen.GameMenuScreen
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.screen.TitleScreen
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
-import net.minecraft.client.gui.screen.ingame.InventoryScreen
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerWarningScreen
 import net.minecraft.client.gui.screen.option.OptionsScreen
@@ -101,16 +98,6 @@ enum class VirtualScreenType(
     GAME_MENU(
         "game_menu",
         recognizer = { it is GameMenuScreen }
-    ),
-
-    INVENTORY(
-        "inventory",
-        recognizer = { it is InventoryScreen || it is CreativeInventoryScreen }
-    ),
-
-    CONTAINER(
-        "container",
-        recognizer = { it is GenericContainerScreen }
     ),
 
     DISCONNECTED("disconnected",

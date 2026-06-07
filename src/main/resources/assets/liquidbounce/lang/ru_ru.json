@@ -470,7 +470,6 @@
   "liquidbounce.module.antiStaff.messages.vanishClear": "Невидимых игроков не было найдено.",
   "liquidbounce.module.attackEffects.description": "Отображает эффект при атаке на сущность.",
   "liquidbounce.module.autoAccount.description": "Автоматическая аутентификация на неофициальных серверах.",
-  "liquidbounce.module.autoChatGame.description": "Использует OpenAI для игры в чате.",
   "liquidbounce.module.autoConfig.description": "Автоматически применяет правильный конфиг для сервера, на котором вы играете.",
   "liquidbounce.module.autoDisable.description": "Автоматически отключает определенные модули.",
   "liquidbounce.module.autoBuff.description": "Автоматически баффает вас, используя различные предметы.",

@@ -164,7 +164,6 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
             ModuleSpammer,
             ModuleAutoAccount,
             ModuleTeams,
-            ModuleAutoChatGame,
             ModuleFocus,
             ModuleAntiStaff,
 
@@ -280,7 +279,6 @@ object ModuleManager : Listenable, Iterable<Module> by modules {
 
             // Client
             ModuleAutoConfig,
-            ModuleRichPresence,
             ModuleCapeTransfer,
             ModuleEnemies,
             ModuleLiquidChat

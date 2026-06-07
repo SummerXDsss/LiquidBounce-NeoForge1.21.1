@@ -41,7 +41,6 @@ import net.ccbluex.liquidbounce.features.misc.AccountManager
 import net.ccbluex.liquidbounce.features.misc.FriendManager
 import net.ccbluex.liquidbounce.features.misc.ProxyManager
 import net.ccbluex.liquidbounce.features.module.ModuleManager
-import net.ccbluex.liquidbounce.features.module.modules.client.ipcConfiguration
 import net.ccbluex.liquidbounce.lang.LanguageManager
 import net.ccbluex.liquidbounce.render.Fonts
 import net.ccbluex.liquidbounce.render.ui.ItemImageAtlas
@@ -218,14 +217,6 @@ object LiquidBounce : Listenable {
             // Check for newest version
             if (updateAvailable) {
                 logger.info("Update available! Please download the latest version from https://liquidbounce.net/")
-            }
-
-            runCatching {
-                ipcConfiguration.let {
-                    logger.info("Loaded Discord IPC configuration.")
-                }
-            }.onFailure {
-                logger.error("Failed to load Discord IPC configuration.", it)
             }
 
             // Refresh local IP info
