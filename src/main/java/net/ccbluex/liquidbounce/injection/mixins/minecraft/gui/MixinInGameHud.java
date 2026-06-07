@@ -25,21 +25,14 @@ import net.ccbluex.liquidbounce.features.module.modules.render.ModuleFreeCam;
 import net.ccbluex.liquidbounce.render.engine.UIRenderer;
 import net.ccbluex.liquidbounce.web.theme.component.ComponentOverlay;
 import net.ccbluex.liquidbounce.web.theme.component.FeatureTweak;
-import net.ccbluex.liquidbounce.web.theme.component.types.IntegratedComponent;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameMode;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -55,31 +48,12 @@ public abstract class MixinInGameHud {
     @Shadow
     private static Identifier POWDER_SNOW_OUTLINE;
 
-    @Shadow
-    @Nullable
-    protected abstract PlayerEntity getCameraPlayer();
-
-
-    @Shadow
-    @Final
-    private MinecraftClient client;
-
-    @Shadow
-    protected abstract void renderHotbarItem(DrawContext context, int x, int y, RenderTickCounter tickCounter, PlayerEntity player, ItemStack stack, int seed);
-
     /**
      * Hook render hud event at the top layer
      */
     @Inject(method = "renderMainHud", at = @At("HEAD"))
     private void hookRenderEventStart(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         UIRenderer.INSTANCE.startUIOverlayDrawing(context, tickCounter.getTickDelta(false));
-
-        // Draw after overlay event
-        var component = ComponentOverlay.getComponentWithTweak(FeatureTweak.TWEAK_HOTBAR);
-        if (component != null && component.getEnabled() &&
-                client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR) {
-            drawHotbar(context, tickCounter, component);
-        }
     }
 
     @Inject(method = "renderOverlay", at = @At("HEAD"), cancellable = true)
@@ -115,34 +89,6 @@ public abstract class MixinInGameHud {
         }
     }
 
-    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    private void hookRenderHotbar(CallbackInfo ci) {
-        if (ComponentOverlay.isTweakEnabled(FeatureTweak.TWEAK_HOTBAR)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderStatusBars", at = @At("HEAD"), cancellable = true)
-    private void hookRenderStatusBars(CallbackInfo ci) {
-        if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_STATUS_BAR)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
-    private void hookRenderExperienceBar(CallbackInfo ci) {
-        if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_EXP_BAR)) {
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
-    private void hookRenderExperienceLevel(CallbackInfo ci) {
-        if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_EXP_BAR)) {
-            ci.cancel();
-        }
-    }
-
     @Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
     private void hookRenderHeldItemTooltip(CallbackInfo ci) {
         if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP)) {
@@ -163,33 +109,6 @@ public abstract class MixinInGameHud {
     private void hookRenderStatusEffectOverlay(CallbackInfo ci) {
         if (ComponentOverlay.isTweakEnabled(FeatureTweak.DISABLE_STATUS_EFFECT_OVERLAY)) {
             ci.cancel();
-        }
-    }
-
-    @Unique
-    private void drawHotbar(DrawContext context, RenderTickCounter tickCounter, IntegratedComponent component) {
-        var playerEntity = this.getCameraPlayer();
-        if (playerEntity == null) {
-            return;
-        }
-
-        var itemWidth = 22.5;
-        var offset = 98;
-        var bounds = component.getAlignment().getBounds(0, 0);
-
-        int center = (int) bounds.getXMin();
-        var y = bounds.getYMin() - 12;
-
-        int l = 1;
-        for (int m = 0; m < 9; ++m) {
-            var x = center - offset + m * itemWidth;
-            this.renderHotbarItem(context, (int) x, (int) y, tickCounter, playerEntity,
-                    playerEntity.getInventory().main.get(m), l++);
-        }
-
-        var offHandStack = playerEntity.getOffHandStack();
-        if (!offHandStack.isEmpty()) {
-            this.renderHotbarItem(context, center - offset - 32, (int) y, tickCounter, playerEntity, offHandStack, l++);
         }
     }
 

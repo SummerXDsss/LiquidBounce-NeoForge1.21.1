@@ -4,7 +4,6 @@
     import Watermark from "./elements/Watermark.svelte";
     import Notifications from "./elements/notifications/Notifications.svelte";
     import TabGui from "./elements/tabgui/TabGui.svelte";
-    import HotBar from "./elements/hotbar/HotBar.svelte";
     import Scoreboard from "./elements/Scoreboard.svelte";
     import {onMount} from "svelte";
     import {getComponents, getGameWindow} from "../../integration/rest";
@@ -48,8 +47,6 @@
                     <Notifications/>
                 {:else if c.name === "TargetHud"}
                     <TargetHud/>
-                {:else if c.name === "Hotbar"}
-                    <HotBar/>
                 {:else if c.name === "Scoreboard"}
                     <Scoreboard/>
                 {:else if c.name === "Taco"}

@@ -35,13 +35,7 @@ enum class ComponentType(
     TAB_GUI("TabGui"),
     ARRAY_LIST("ArrayList"),
     NOTIFICATIONS("Notifications"),
-    HOTBAR("Hotbar", tweaks = arrayOf(
-        FeatureTweak.TWEAK_HOTBAR,
-        FeatureTweak.DISABLE_STATUS_BAR,
-        FeatureTweak.DISABLE_EXP_BAR,
-        FeatureTweak.DISABLE_HELD_ITEM_TOOL_TIP,
-        FeatureTweak.DISABLE_OVERLAY_MESSAGE
-    )),
+    HOTBAR("Hotbar"),
     EFFECTS("Effects", tweaks = arrayOf(
         FeatureTweak.DISABLE_STATUS_EFFECT_OVERLAY
     )),
