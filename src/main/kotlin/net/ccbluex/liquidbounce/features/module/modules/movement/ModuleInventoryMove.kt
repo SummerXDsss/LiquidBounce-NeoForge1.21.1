@@ -79,7 +79,9 @@ object ModuleInventoryMove : Module("InventoryMove", Category.MOVEMENT) {
     }
 
     fun shouldHandleInputs(keyBinding: KeyBinding): Boolean {
-        if (!enabled || mc.currentScreen is ChatScreen || isInCreativeSearchField()) {
+        val screen = mc.currentScreen ?: return false
+
+        if (!enabled || screen is ChatScreen || isInCreativeSearchField()) {
             return false
         }
 
@@ -88,7 +90,7 @@ object ModuleInventoryMove : Module("InventoryMove", Category.MOVEMENT) {
         }
 
         // If we are in a handled screen, we should handle the inputs only if the undetectable option is not enabled
-        return !undetectable || mc.currentScreen !is HandledScreen<*>
+        return !undetectable || screen !is HandledScreen<*>
     }
 
     /**

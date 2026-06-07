@@ -45,6 +45,7 @@ import net.minecraft.entity.MovementType;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Vec3d;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -162,7 +163,10 @@ public abstract class MixinClientPlayerEntity extends MixinPlayerEntity {
     /**
      * Hook custom multiplier
      */
-    @Inject(method = "tickMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z", ordinal = 0))
+    @Inject(method = "tickMovement", at = @At(value = "FIELD",
+            target = "Lnet/minecraft/client/network/ClientPlayerEntity;ticksLeftToDoubleTapSprint:I",
+            opcode = Opcodes.PUTFIELD,
+            shift = At.Shift.AFTER))
     private void hookCustomMultiplier(CallbackInfo callbackInfo) {
         final Input input = this.input;
         // reverse

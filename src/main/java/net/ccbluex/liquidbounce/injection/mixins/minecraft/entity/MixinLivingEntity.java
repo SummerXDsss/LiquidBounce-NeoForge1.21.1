@@ -49,6 +49,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -85,6 +86,12 @@ public abstract class MixinLivingEntity extends MixinEntity {
     @Shadow
     public abstract boolean addStatusEffect(StatusEffectInstance effect);
 
+    @Unique
+    private boolean liquid_bounce$hasJumpEventResult;
+
+    @Unique
+    private float liquid_bounce$jumpEventMotion;
+
     /**
      * Hook anti levitation module
      */
@@ -115,8 +122,12 @@ public abstract class MixinLivingEntity extends MixinEntity {
             return original;
         }
 
-        final var jumpEvent = EventManager.INSTANCE.callEvent(new PlayerJumpEvent(original));
-        return jumpEvent.getMotion();
+        if (!this.liquid_bounce$hasJumpEventResult) {
+            this.liquid_bounce$handleJumpEvent(original);
+        }
+
+        this.liquid_bounce$hasJumpEventResult = false;
+        return this.liquid_bounce$jumpEventMotion;
     }
 
     @Inject(method = "jump", at = @At("RETURN"))
@@ -180,6 +191,14 @@ public abstract class MixinLivingEntity extends MixinEntity {
             this.jump();
             jumpingCooldown = 10;
         }
+    }
+
+    @Unique
+    protected boolean liquid_bounce$handleJumpEvent(float motion) {
+        final var jumpEvent = EventManager.INSTANCE.callEvent(new PlayerJumpEvent(motion));
+        this.liquid_bounce$jumpEventMotion = jumpEvent.getMotion();
+        this.liquid_bounce$hasJumpEventResult = true;
+        return !jumpEvent.isCancelled();
     }
 
     /**

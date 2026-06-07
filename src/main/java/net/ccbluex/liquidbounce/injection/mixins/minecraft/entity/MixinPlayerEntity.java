@@ -23,7 +23,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.ccbluex.liquidbounce.event.EventManager;
-import net.ccbluex.liquidbounce.event.events.PlayerJumpEvent;
 import net.ccbluex.liquidbounce.event.events.PlayerSafeWalkEvent;
 import net.ccbluex.liquidbounce.event.events.PlayerStrideEvent;
 import net.ccbluex.liquidbounce.features.command.commands.client.fakeplayer.FakePlayer;
@@ -132,9 +131,7 @@ public abstract class MixinPlayerEntity extends MixinLivingEntity {
             return;
         }
 
-        final PlayerJumpEvent jumpEvent = new PlayerJumpEvent(getJumpVelocity());
-        EventManager.INSTANCE.callEvent(jumpEvent);
-        if (jumpEvent.isCancelled()) {
+        if (!this.liquid_bounce$handleJumpEvent(getJumpVelocity())) {
             ci.cancel();
         }
     }
