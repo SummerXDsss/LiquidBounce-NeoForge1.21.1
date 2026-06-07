@@ -185,7 +185,7 @@ fun RestNode.accountsRest() {
 
     post("/account/restore") {
         AccountManager.restoreInitial()
-        httpOk(protocolGson.toJsonTree(mc.session))
+        httpOk(sessionJson())
     }
 
     put("/account/favorite") {

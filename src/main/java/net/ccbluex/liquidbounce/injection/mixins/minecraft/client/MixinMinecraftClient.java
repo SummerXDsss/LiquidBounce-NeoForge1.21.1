@@ -28,6 +28,7 @@ import net.ccbluex.liquidbounce.features.module.modules.render.ModuleXRay;
 import net.ccbluex.liquidbounce.render.engine.RenderingFlags;
 import net.ccbluex.liquidbounce.utils.combat.CombatManager;
 import net.minecraft.SharedConstants;
+import net.minecraft.client.Mouse;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screen.Screen;
@@ -67,9 +68,20 @@ public abstract class MixinMinecraftClient {
     public GameOptions options;
     @Shadow
     @Nullable
+    public Screen currentScreen;
+    @Shadow
+    @Nullable
+    public ClientWorld world;
+    @Shadow
+    @Final
+    public Mouse mouse;
+    @Shadow
+    @Nullable
     private IntegratedServer server;
     @Shadow
     private int itemUseCooldown;
+
+    private int pendingCursorRelockTicks;
 
     @Inject(method = "isAmbientOcclusionEnabled()Z", at = @At("HEAD"), cancellable = true)
     private static void injectXRayFullBright(CallbackInfoReturnable<Boolean> callback) {
@@ -198,12 +210,34 @@ public abstract class MixinMinecraftClient {
         }
     }
 
+    @Inject(method = "setScreen", at = @At("RETURN"))
+    private void hookScreenCloseCursorRelock(Screen screen, CallbackInfo callbackInfo) {
+        if (screen == null && this.player != null && this.world != null) {
+            this.pendingCursorRelockTicks = 2;
+        }
+    }
+
     /**
      * Hook game tick event at HEAD
      */
     @Inject(method = "tick", at = @At("HEAD"))
     private void hookTickEvent(CallbackInfo callbackInfo) {
         EventManager.INSTANCE.callEvent(new GameTickEvent());
+    }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void hookPendingCursorRelock(CallbackInfo callbackInfo) {
+        if (this.pendingCursorRelockTicks <= 0) {
+            return;
+        }
+
+        if (this.currentScreen != null || this.player == null || this.world == null) {
+            this.pendingCursorRelockTicks = 0;
+            return;
+        }
+
+        this.pendingCursorRelockTicks--;
+        this.mouse.lockCursor();
     }
 
     /**

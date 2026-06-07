@@ -77,13 +77,17 @@ class BrowserScreen(val url: String, title: Text = "".asText()) : Screen(title) 
 
     override fun shouldPause() = false
 
-    override fun close() {
+    override fun removed() {
         // Close all tabs
         browserTabs.removeIf {
             it.closeTab()
             true
         }
 
+        super.removed()
+    }
+
+    override fun close() {
         super.close()
     }
 

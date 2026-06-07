@@ -10,9 +10,9 @@
 
     async function refreshSession() {
         const session = await getSession();
-        username = session.username;
-        avatar = session.avatar;
-        premium = session.premium;
+        username = session.username || "Player";
+        avatar = session.avatar || "img/steve.png";
+        premium = session.premium === true;
     }
 
     onMount(async () => {

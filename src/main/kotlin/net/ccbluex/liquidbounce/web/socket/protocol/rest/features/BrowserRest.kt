@@ -20,10 +20,10 @@
 package net.ccbluex.liquidbounce.web.socket.protocol.rest.features
 
 import com.google.gson.JsonObject
+import com.mojang.blaze3d.systems.RenderSystem
 import net.ccbluex.liquidbounce.config.util.decode
 import net.ccbluex.liquidbounce.utils.client.mc
 import net.ccbluex.liquidbounce.web.integration.BrowserScreen
-import net.ccbluex.liquidbounce.web.integration.browserTabs
 import net.ccbluex.liquidbounce.web.socket.netty.httpBadRequest
 import net.ccbluex.liquidbounce.web.socket.netty.httpOk
 import net.ccbluex.liquidbounce.web.socket.netty.rest.RestNode
@@ -55,7 +55,13 @@ internal fun RestNode.browserRest() {
     post("/browser/close") {
         val browserScreen = mc.currentScreen as? BrowserScreen
             ?: return@post httpBadRequest("No browser screen")
-        mc.setScreen(null)
+
+        RenderSystem.recordRenderCall {
+            if (mc.currentScreen === browserScreen) {
+                browserScreen.close()
+            }
+        }
+
         httpOk(JsonObject())
     }
 
@@ -99,14 +105,4 @@ internal fun RestNode.browserRest() {
         httpOk(JsonObject())
     }
 
-    post("/browser/close") {
-        val browserScreen = mc.currentScreen as? BrowserScreen
-            ?: return@post httpBadRequest("No browser screen")
-        val browserTab = browserScreen.browserTab
-            ?: return@post httpBadRequest("No browser tab")
-
-        browserTab.closeTab()
-        browserTabs.remove(browserTab)
-        httpOk(JsonObject())
-    }
 }
